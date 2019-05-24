@@ -17,8 +17,8 @@ class sequential_queue
     };
     std::unique_ptr<node> head;
     node* tail;
-    // std::mutex head_mutex;
-    // std::mutex tail_mutex;
+    std::mutex head_mutex;
+    std::mutex tail_mutex;
 
 public:
     sequential_queue() : head(new node), tail(head.get()) 
@@ -29,7 +29,7 @@ public:
         std::unique_ptr<node> new_node(new node(std::move(value)));
         node* const new_tail = new_node.get();
 
-        // std::lock_guard<std::mutex> tlg(tail_mutex);
+        std::lock_guard<std::mutex> tlg(tail_mutex);
         if(tail)
         {
             std::cout << "Tail ditemukan" << std::endl;
@@ -37,7 +37,7 @@ public:
         }
         else
         {
-            // std::lock_guard<std::mutex> hlg(head_mutex);
+            std::lock_guard<std::mutex> hlg(head_mutex);
             std::cout << "Tail tidak ditemukan" << std::endl;
             head = std::move(new_node);
         }
@@ -47,7 +47,7 @@ public:
 
     std::shared_ptr<T> pop()
     {
-        // std::lock_guard<std::mutex> hlg(head_mutex);
+        std::lock_guard<std::mutex> hlg(head_mutex);
         if(head.get() == tail)
         {
             return std::shared_ptr<T>();
@@ -68,8 +68,5 @@ public:
 
 int main()
 {
-    sequential_queue<int> data;
-    data.push(20);
 
-    data.lihat();
 }
